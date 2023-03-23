@@ -1,4 +1,5 @@
 #include"lil.h"
+#include"bullet.h"
 #include<iostream>
 
 using namespace std;
@@ -38,9 +39,18 @@ void test_lil(){
     return;
 }
 
+void check(int arr[]){
+    cout<<sizeof(arr[0])<<endl;
+    cout<<arr<<endl;
+}
 
 int main(){
-    test_lil();
-    return 0;    
+    //test_lil();
+       
+    int a[]= {1,2,3,4};
+    cout<<a<<endl;
+    cout<<sizeof(a)<<endl;
+    check(a);
+    return 0; 
 }
 
