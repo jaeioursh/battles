@@ -7,7 +7,11 @@
 #include <cstdlib>
 #include <time.h>
 
+#include <fstream>
+#include <sstream>
+#include <vector>
 
+using namespace std;
 
 void line_draw(sf::RenderWindow& window,sf::VertexArray vertices, const sf::Vector2f& point1, const sf::Vector2f& point2, float thickness){
     sf::Vector2f direction = point2 - point1;
@@ -23,8 +27,32 @@ void line_draw(sf::RenderWindow& window,sf::VertexArray vertices, const sf::Vect
     window.draw(vertices);
 }
 
+
+
+vector<vector<int>> read_csv(string filename) {
+    vector<vector<int>> data;
+    ifstream file(filename);
+    string line;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        vector<int> row;
+        string value;
+
+        while (getline(ss, value, ',')) {
+            row.push_back(stoi(value));
+        }
+
+        data.push_back(row);
+    }
+
+    file.close();
+
+    return data;
+}
+
+
 float unif(){
-    float(rand()%1000000000)/1000000000;
+    return float(rand()%1000000000)/1000000000;
 }
 
 int randint(int val){

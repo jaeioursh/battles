@@ -18,7 +18,6 @@ class robot{
     bool dead;
     robot* lock_on;
     float *model;
-    float *model_draw;
     int model_len;
 
     VertexArray pts;
@@ -31,9 +30,42 @@ class robot{
     void shoot(bullet*);
     void ai(float&, float&, lil<robot>);
     void move(float&, float&);
+    void draw(RenderWindow&,float,float,float);
 
 };
 
+
+void robot::draw(RenderWindow& window,float dx, float dy, float scale){
+    float x1,x2,y1,y2,xt,yt;
+
+    for(int i=0;i<model_len/8;i++){
+        for(int j=0;j<4;j++){
+            x1=model[i*8+j*2];
+            y1=model[i*8+j*2+1];
+            if (j==3){
+                x2=model[i*8];
+                y2=model[i*8+1];
+            }
+            else{
+                x2=model[i*8+j*2+2];
+                y2=model[i*8+j*2+3];
+            }
+            xt=cos(t)*x1-sin(t)*y1 + x;
+            yt=sin(t)*x1+cos(t)*y1 + y;
+            x1=(xt+dx)*scale;
+            y1=(yt+dx)*scale;
+
+            xt=cos(t)*x2-sin(t)*y2 + x;
+            yt=sin(t)*x2+cos(t)*y2 + y;
+            x2=(xt+dx)*scale;
+            y2=(yt+dy)*scale;
+
+            line_draw(window,pts, Vector2f(x1,y1), Vector2f(x2,y2), 4.0 * scale);
+
+        }
+    }
+
+}
 
 
 robot::robot(int Team,float Health,float* Model,int Model_len, float Dmg, float X, float Y, float T, float Size, float Speed, int Clip,int Rps,float Lim,int Rload):pts(Quads,4){
@@ -46,7 +78,6 @@ robot::robot(int Team,float Health,float* Model,int Model_len, float Dmg, float 
 
         model_len=model_len;
         model=new float[model_len];
-        model_draw=new float[model_len];
         for(int i=0;i<model_len;i++)
             model[i]=Model[i];
         
@@ -89,13 +120,14 @@ void robot::move(float& ang, float& vel){
 void robot::ai(float& ang, float& vel, lil<robot> enemies){
     float ang2,X,Y,diff;
     int idx;
-    node* tmp;
-    if (lock_on==NULL || lock_on.dead==1){
+    
+    if (lock_on==NULL || lock_on->dead==1){
         idx = randint(enemies.len);
-        tmp=enemies.head;
+
+        enemies.reset();
         for(int i=0;i<idx;i++)
-            tmp=tmp->next;
-        lock_on=tmp->elem;
+            enemies.inc();
+        lock_on=enemies.get();
     }
         
 

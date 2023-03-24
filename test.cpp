@@ -1,56 +1,65 @@
 #include"lil.h"
-#include"bullet.h"
+#include"utils.h"
+//#include"bullet.h"
 #include<iostream>
 
 using namespace std;
 
+void test_csv(){
+    vector<vector<int>> a;
+    a=read_csv("teams/e1.csv");
+    
+    for(int i=0;i<3;i++){
+        for(int j=0;j<3;j++){
+            cout<<a[i][j]<<' ';
+        }
+        cout<<endl;
+    }
+
+}
 
 void test_lil(){
     cout<<"beggining lil test"<<endl;
     lil<int> lst;
-    node<int> a;
-    node<int> b;
-    node<int> c;
-    node<int>* ptr;
+
 
     int A=5;
     int B=6;
     int C=7;
 
-    a.elem=&A;
-    b.elem=&B;
-    c.elem=&C;
+
     
-    lst.add(&a);
-    lst.add(&b);
-    lst.add(&c);
-    lst.remove(&c);
+    lst.add(&A);
+    lst.add(&B);
+    lst.add(&C);
+    
+
+    lst.clear();
+
+    lst.add(&A);
+    lst.add(&B);
+    lst.add(&C);
+    
 
 
-    cout<< *a.elem<<endl;
-    cout<< lst.len<<endl;
-    ptr=lst.head;
-    while (ptr != NULL)
-    {
-        cout <<*ptr->elem<<endl;
-        ptr=ptr->next;
+    for(int i=0;i<3;i++){
+        cout<<*lst.get()<<" "<< lst.len << endl;
+        lst.inc();
     }
-    
+    lst.reset();
+    lst.add(&A);
+    for(int i=0;i<3;i++){
+        cout<<*lst.get()<<" "<< lst.len << endl;
+        lst.inc();
+    }
     return;
 }
 
-void check(int arr[]){
-    cout<<sizeof(arr[0])<<endl;
-    cout<<arr<<endl;
-}
 
 int main(){
     //test_lil();
-       
-    int a[]= {1,2,3,4};
-    cout<<a<<endl;
-    cout<<sizeof(a)<<endl;
-    check(a);
+    test_csv();
+
     return 0; 
 }
 
