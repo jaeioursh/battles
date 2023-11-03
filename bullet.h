@@ -1,6 +1,4 @@
 #include <cmath>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
 
 #include "utils.h"
 using namespace sf;
@@ -9,8 +7,6 @@ class bullet{
     public:
         float x,y,t,x_,y_,dmg,size,speed,hit;
         int team;
-        VertexArray pts;
-        Color col;
 
         bullet();
         void set(float,float,float,float,int,float,float);
@@ -22,15 +18,11 @@ class bullet{
 
 
 
-bullet::bullet():pts(Quads,4){
+bullet::bullet(){
 
 }
 
-void bullet::draw(RenderWindow& window,float dx, float dy, float scale){
 
-line_draw(window,pts, Vector2f((x_+dx)*scale,(y_+dy)*scale), Vector2f((x+dx)*scale,(y+dy)*scale), 4.0 * scale);
-
-}
 
 
 void bullet::set(float X,float Y,float T,float Dmg,int Team,float Size,float Speed){
@@ -45,11 +37,7 @@ void bullet::set(float X,float Y,float T,float Dmg,int Team,float Size,float Spe
     speed=Speed;
     hit=0;
 
-    if (team==0)
-        col=Color::Red;
 
-    for (int i=0; i<4; ++i)
-            pts[i].color = col;
 }
 
 float bullet::dist(float X, float Y){

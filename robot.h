@@ -1,6 +1,4 @@
 #include <cmath>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
 
 #include "bullet.h"
 #include "utils.h"
@@ -9,19 +7,22 @@ using namespace sf;
 
 class robot{
     public:
+
     int team,rps;
     float health,hp_max,speed,dmg;
     float x,y,t;
-    float size,lim;
-    int clip,reload_delay,mag;
+    float lim;
+    int clip,reload_delay,mag;  //stats
     int offset;
     bool dead;
-    robot* lock_on;
-    float *model;
+    robot* lock_on;         //target
+    float *model;           //values for model shape
     int model_len;
 
-    VertexArray pts;
-    robot(int,float,float*,int, float, float, float, float, float, float, int,int,float,int);
+    
+    robot(float,float, float, int, float);
+    virtual void init();
+    void setup(float[]);
     ~robot();
     void alt(){
         return;
@@ -30,72 +31,50 @@ class robot{
     void shoot(bullet*);
     void ai(float&, float&, lil<robot>);
     void move(float&, float&);
-    void draw(RenderWindow&,float,float,float);
 
 };
 
 
-void robot::draw(RenderWindow& window,float dx, float dy, float scale){
-    float x1,x2,y1,y2,xt,yt;
 
-    for(int i=0;i<model_len/8;i++){
-        for(int j=0;j<4;j++){
-            x1=model[i*8+j*2];
-            y1=model[i*8+j*2+1];
-            if (j==3){
-                x2=model[i*8];
-                y2=model[i*8+1];
-            }
-            else{
-                x2=model[i*8+j*2+2];
-                y2=model[i*8+j*2+3];
-            }
-            xt=cos(t)*x1-sin(t)*y1 + x;
-            yt=sin(t)*x1+cos(t)*y1 + y;
-            x1=(xt+dx)*scale;
-            y1=(yt+dx)*scale;
 
-            xt=cos(t)*x2-sin(t)*y2 + x;
-            yt=sin(t)*x2+cos(t)*y2 + y;
-            x2=(xt+dx)*scale;
-            y2=(yt+dy)*scale;
+robot::robot(float X, float Y, float T, int Team, float Lim){
+    
+        team=Team;
+        x=X;
+        y=Y;
+        t=T;
+        lim=Lim;
 
-            line_draw(window,pts, Vector2f(x1,y1), Vector2f(x2,y2), 4.0 * scale);
-
-        }
-    }
+        dead=0;
+    
+        lock_on=NULL;
+        offset=randint(60);
+        init();
+        
 
 }
 
 
-robot::robot(int Team,float Health,float* Model,int Model_len, float Dmg, float X, float Y, float T, float Size, float Speed, int Clip,int Rps,float Lim,int Rload):pts(Quads,4){
+
+void robot::init(){
+    health=100;
+    speed=0.1;
+    dmg=10;
+    rps=5;
+    clip=4;
+    reload_delay=2;
     
-        team=Team;
-        health=Health;
-        hp_max=Health;
-        speed=Speed;
-        
+    float Model[]={-1.  , -1.  , -1.  ,  1. };
+    model_len=4;
+    setup(Model);
+}
 
-        model_len=model_len;
-        model=new float[model_len];
-        for(int i=0;i<model_len;i++)
-            model[i]=Model[i];
-        
-        
-        dmg=Dmg;
-        rps=rps;
-        x=X;
-        y=Y;
-        t=T;
-        size=Size;
-        clip=Clip;
-        mag=Clip;
-        reload_delay=Rload;
-        dead=0;
-        lim=Lim;
-        lock_on=NULL;
-        offset=randint(60);
-
+void robot::setup(float Model[]){
+    hp_max=health;
+    mag=clip;
+    model=new float[model_len];
+    for(int i=0;i<model_len;i++)
+        model[i]=Model[i];
 }
 
 void robot::move(float& ang, float& vel){
@@ -177,5 +156,4 @@ void robot::shoot(bullet* blt){
 
 robot::~robot(){
     delete[] model;
-    delete[] model_draw;
 }
