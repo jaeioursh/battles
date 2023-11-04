@@ -1,3 +1,6 @@
+#ifndef ROBOT_H
+#define ROBOT_H
+
 #include <cmath>
 
 #include "bullet.h"
@@ -12,6 +15,7 @@ class robot{
     float health,hp_max,speed,dmg;
     float x,y,t;
     float lim;
+    float rad;
     int clip,reload_delay,mag;  //stats
     int offset;
     bool dead;
@@ -20,7 +24,7 @@ class robot{
     int model_len;
 
     
-    robot(float,float, float, int, float);
+    explicit robot(float,float, float, int);
     virtual void init();
     void setup(float[]);
     ~robot();
@@ -28,29 +32,27 @@ class robot{
         return;
     }
     bool can_shoot();
-    void shoot(bullet*);
-    void ai(float&, float&, lil<robot>);
-    void move(float&, float&);
+    bullet* shoot();
+    void ai(lil<robot> & );
+    void move(float);
 
 };
 
 
 
 
-robot::robot(float X, float Y, float T, int Team, float Lim){
+robot::robot(float X, float Y, float T, int Lim){
     
-        team=Team;
-        x=X;
-        y=Y;
+        team=0;
+        x=X+0.5;
+        y=Y+0.5;
         t=T;
-        lim=Lim;
+        lim=(float)Lim;
 
         dead=0;
     
         lock_on=NULL;
         offset=randint(60);
-        init();
-        
 
 }
 
@@ -65,7 +67,6 @@ void robot::init(){
     reload_delay=2;
     
     float Model[]={-1.  , -1.  , -1.  ,  1. };
-    model_len=4;
     setup(Model);
 }
 
@@ -77,26 +78,47 @@ void robot::setup(float Model[]){
         model[i]=Model[i];
 }
 
-void robot::move(float& ang, float& vel){
-  
-    t+=ang;
-    x+=vel*cos(t)*speed;
-    y+=vel*sin(t)*speed;
-    if (t>M_PI)
-        t-=M_PI*2;
-    if (t<-M_PI)
-        t+=M_PI*2;
-    if (y>lim-1)
-        y=lim-1;
-    if (y<0)
-        y=0;
-    if (x>lim-1)
-        x=lim-1;
-    if (x<0)
-        x=0;
+void robot::move(float dt){
+    float X,Y,ang,diff;
+    if (lock_on != NULL){
+        X=lock_on->x;
+        Y=lock_on->y;
+
+        
+
+        ang=atan2(Y-y,X-x);
+        diff=-(t-ang);
+        
+        if (diff>M_PI)
+            diff-=M_PI*2;
+        if (diff<-M_PI)
+            diff+=M_PI*2;
+
+        if (diff>0.1)
+            diff=0.1;
+        if (diff<-0.1)
+            diff=-0.1;
+
+
+        t+=diff*speed*dt;
+        x+=cos(t)*speed*dt;
+        y+=sin(t)*speed*dt;
+        if (t>M_PI)
+            t-=M_PI*2;
+        if (t<-M_PI)
+            t+=M_PI*2;
+        if (y>lim-1)
+            y=lim-1;
+        if (y<0)
+            y=0;
+        if (x>lim-1)
+            x=lim-1;
+        if (x<0)
+            x=0;
+    }
 }
         
-void robot::ai(float& ang, float& vel, lil<robot> enemies){
+void robot::ai(lil<robot> & enemies){
     float ang2,X,Y,diff;
     int idx;
     
@@ -110,24 +132,7 @@ void robot::ai(float& ang, float& vel, lil<robot> enemies){
     }
         
 
-    X=lock_on->x;
-    Y=lock_on->y;
-
-    vel=1.0;
     
-
-    ang2=atan2(Y-y,X-x);
-    diff=-(t-ang2);
-    
-    if (diff>M_PI)
-        diff-=M_PI*2;
-    if (diff<-M_PI)
-        diff+=M_PI*2;
-
-    if (diff>0.1)
-        diff=0.1;
-    if (diff<-0.1)
-        diff=-0.1;
 }
 
 
@@ -148,12 +153,15 @@ bool robot::can_shoot(){
 
 }
 
-void robot::shoot(bullet* blt){
-
-                            //size,speed
-    blt->set(x,y,t,dmg,team,10.0,10.0);
+bullet* robot::shoot(){
+    bullet* blt=new bullet();                            //size,speed
+    blt->set(x,y,t,dmg,10.0,10.0);
+    return blt;
 }
 
 robot::~robot(){
     delete[] model;
 }
+
+
+#endif

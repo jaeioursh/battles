@@ -13,7 +13,7 @@ fast:
 
 debug:
 	clear
-	g++  ${FLAGS} -g game.cpp -o run.exe -lsfml-graphics -lsfml-window -lsfml-system
+	g++  ${FLAGS} -g test.cpp -o run.exe -lsfml-graphics -lsfml-window -lsfml-system
 	gdb run.exe  
 
 test:

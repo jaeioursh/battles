@@ -1,3 +1,8 @@
+#ifndef BULLET_H
+#define BULLET_H
+
+
+
 #include <cmath>
 
 #include "utils.h"
@@ -6,13 +11,12 @@ using namespace sf;
 class bullet{
     public:
         float x,y,t,x_,y_,dmg,size,speed,hit;
-        int team;
 
         bullet();
-        void set(float,float,float,float,int,float,float);
+        void set(float,float,float,float,float,float);
         float dist(float,float);
-        void step();
-        void draw(RenderWindow&,float,float,float);
+        void step(float dt);
+        
 
 };
 
@@ -25,14 +29,13 @@ bullet::bullet(){
 
 
 
-void bullet::set(float X,float Y,float T,float Dmg,int Team,float Size,float Speed){
+void bullet::set(float X,float Y,float T,float Dmg,float Size,float Speed){
     x=X;
     y=Y;
     x_=X;
     y_=Y;
     t=T;
     dmg=Dmg;
-    team=Team;
     size=Size;
     speed=Speed;
     hit=0;
@@ -74,11 +77,14 @@ float bullet::dist(float X, float Y){
 
 }
 
-void bullet::step(){
+void bullet::step(float dt){
     x_=x;
     y_=y;
-    x=x_+cos(t)*speed;
-    y=y_+sin(t)*speed;
+    x=x_+cos(t)*speed*dt;
+    y=y_+sin(t)*speed*dt;
 }
+
+
+#endif
 
 

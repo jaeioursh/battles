@@ -574,23 +574,30 @@ class game:
         cv2.waitKey(1)#int(1000/self.fps))
         return img
 
-specs1=[large]*22+[medium]*90+[uber]*3+[turret]*5+[organic]*5+[replicator]*0
-specs2=[replicator]*75+[medium]*48+[uber]*2
-#specs=[organic]*30
-sim=game(specs1,specs2)
-frames=[]
-for i in range(1000):
-    f=sim.step()
-    frames.append(f)
+if 0:
+    specs1=[large]*22+[medium]*90+[uber]*3+[turret]*5+[organic]*5+[replicator]*0
+    specs2=[replicator]*75+[medium]*48+[uber]*2
+    #specs=[organic]*30
+    sim=game(specs1,specs2)
+    frames=[]
+    for i in range(1000):
+        f=sim.step()
+        frames.append(f)
 
-if 1:
-    itr=1
-    writer = cv2.VideoWriter("vids/rwar"+str(itr)+".mp4", cv2.VideoWriter_fourcc(*'MP4V'),sim.fps,(sim.map_size//4,sim.map_size//4))
-    for f in frames:
-        writer.write(f)
-    writer.release()
-    #ffmpeg -i vids/rwar1.mp4 -vcodec libx264 -crf 24 vids/rwar2.mp4 
-    #use 24-30 // lower= higher quality, lower compression
+    if 1:
+        itr=1
+        writer = cv2.VideoWriter("vids/rwar"+str(itr)+".mp4", cv2.VideoWriter_fourcc(*'MP4V'),sim.fps,(sim.map_size//4,sim.map_size//4))
+        for f in frames:
+            writer.write(f)
+        writer.release()
+        #ffmpeg -i vids/rwar1.mp4 -vcodec libx264 -crf 24 vids/rwar2.mp4 
+        #use 24-30 // lower= higher quality, lower compression
 
-    
-        
+
+model=uber
+mdl=model((0,0),0,0).model
+mdl=mdl/np.max(mdl)
+mdl=mdl[:,::-1]
+mdl=mdl.flatten()
+print(list(mdl))
+print(len(mdl))

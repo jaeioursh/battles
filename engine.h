@@ -1,5 +1,8 @@
+#ifndef ENGINE_H
+#define ENGINE_H
 
 #include"robot.h"
+#include"bots.h"
 #include"bullet.h"
 #include"lil.h"
 
@@ -7,7 +10,6 @@
 class engine{
     public:
         int map_size;
-        int res;
         lil<robot> team1;
         lil<robot> dead1;
         lil<robot> team2;
@@ -20,41 +22,132 @@ class engine{
         lil<bullet>* bmap2;
 
         int idx;
-        float fps;
         int rob_limit;
         float dt;
 
         void init();
         void collide();
+        void move(float);
         void reset();
-        void step();
-        void clean(lil<robot>*,lil<robot>*,lil<bullet>*);
-        engine(int,float);
+        void step(float);
+        void clean();
+        void add_bot(float,float,float,int,int);
+        engine(int);
 
 };
 
-engine::engine(int sz,float FPS){
-    fps=FPS;
+engine::engine(int sz){
+   
     map_size=sz;
     bmap1 = new lil<bullet>[sz*sz];
     bmap2 = new lil<bullet>[sz*sz];
-
+    idx=0;
 }
 
 void engine::reset(){
 
 }
 
-void engine::step(){
+void engine::step(float dt){
+    move(dt);
+    clean();
+    collide();
+    idx++;
+
+
+}
+
+void engine::clean(){
+    robot* rob;
+    bullet* bul;
+    int x,y,idx,len;
+
+    lil<robot>* team;
+    lil<robot>* dead;
+    lil<bullet>* bullets;
+    lil<bullet>* bmap;
     
 
+    for(int q=0;q<2;q++){
+        if(q==0){
+            team = &team1; dead=&dead1; bullets=&bullets1; bmap=bmap1;
+        }
+        else{
+            team = &team2; dead=&dead2; bullets=&bullets2; bmap=bmap2;
+        }
+        for(int i=0;i<map_size*map_size;i++)
+            bmap[i].clear();
+            
+        team->reset();
+        len=team->len;
+        for(int i=0;i<len;i++){
+            rob=team->get();
+            if(rob->health<=0 ){
+                team->remove();
+                dead->add(rob);
+            }
+            else
+                team->inc();
+        }
+        bullets->reset();
+        len=bullets->len;
+        for(int i=0;i<len;i++){
+            bul=bullets->get();
+            if(bul->hit == 1 || bul->x < 0 || bul->x >= (float)map_size || bul->y < 0 || bul->y >= (float)map_size){
+                bullets->remove();
+                delete bul;
+            }
+            else{
+                idx = (int)bul->x +(int)bul->y * map_size;
+                bmap[idx].add(bul);
+                bullets->inc();
+            }
+
+            
+        
+        }
+    }
+}
+void engine::move(float dt){
+    robot* rob;
+    bullet* bul;
+    int x,y,idx;
+
+    lil<robot>* team;
+    lil<robot>* enemy;
+    lil<bullet>* bullets;
+    
+
+    for(int q=0;q<2;q++){
+        if(q==0){
+            team = &team1; enemy = &team2; bullets=&bullets1;
+        }
+        else{
+            team = &team2; enemy = &team1; bullets=&bullets2;
+        }
+        team->reset();
+        for(int i=0;i<team->len;i++){
+            rob=team->get();
+            team->inc();
+            rob->ai(*enemy);
+            rob->move(dt);
+            if(rob->can_shoot()){
+                bul=rob->shoot();
+                bullets->add(bul);
+            }
+        }
+        bullets->reset();
+        for(int i=0;i<bullets->len;i++){
+            bul=bullets->get();
+            bullets->inc();
+            bul->step(dt);
+        }
+
+    }
+
+
 
 }
-
-void engine::clean(lil<robot>* team,lil<robot>* dead,lil<bullet>* bullets){
-
-}
-
 void engine::collide(){
     robot* rob;
     bullet* bul;
@@ -67,14 +160,10 @@ void engine::collide(){
 
     for(int q=0;q<2;q++){
         if(q==0){
-            team = &team1;
-            dead = &dead1;
-            bmap = bmap2;
+            team = &team1; dead = &dead1; bmap = bmap2;
         }
         else{
-            team = &team2;
-            dead = &dead2;
-            bmap = bmap1;
+            team = &team2; dead = &dead2; bmap = bmap1;
         }
         
         team->reset();
@@ -100,13 +189,38 @@ void engine::collide(){
                     }
                 
         }
-        clean(team,dead,bullets);
+
     }
 
 }
+
+
+
 
 void engine::init(){
     
 
 
 }
+
+
+void engine::add_bot(float x,float y,float t,int typ,int tteam){
+    lil<robot>* team;
+    robot* rob=NULL;
+
+    if(tteam==1){
+        team = &team1;
+    }
+    else{
+        team = &team2;
+    }
+    if(typ==0)
+        rob=new large(x,y,t,map_size);
+    if(typ==1)
+        rob=new uber(x,y,t,map_size);
+    
+    if(rob!=NULL)
+        team->add(rob);
+
+}
+#endif
