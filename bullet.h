@@ -16,8 +16,6 @@ class bullet{
         void set(float,float,float,float,float,float);
         float dist(float,float);
         void step(float dt);
-        
-
 };
 
 

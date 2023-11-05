@@ -37,7 +37,7 @@ class render{
 };
 
 void line_draw(RenderWindow*window, const Vector2f& point1, const Vector2f& point2, float thickness, Color col){
-    thickness*=0.05;
+    thickness*=0.02;
     VertexArray vertices(Quads,4);
     Vector2f direction = point2 - point1;
     Vector2f unitDirection = direction/std::sqrt(direction.x*direction.x+direction.y*direction.y);
@@ -131,7 +131,7 @@ void render::draw_robot(robot& rob,Color col){
 
 void render::draw_bullet(bullet& bul,Color col){
 
-    line_draw(window, Vector2f((bul.x_+dx)*scale,(bul.y_+dy)*scale), Vector2f((bul.x+dx)*scale,(bul.y+dy)*scale), scale,col);
+    line_draw(window, Vector2f((bul.x-cos(bul.t)*.25)*scale,(bul.y-sin(bul.t)*0.25)*scale), Vector2f((bul.x+dx)*scale,(bul.y+dy)*scale), scale,col);
 
 }
 

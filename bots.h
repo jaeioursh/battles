@@ -13,11 +13,11 @@ class large:public robot{
 };
 void large::init(){
     health=100;
-    speed=0.1;
+    speed=0.05;
     dmg=10;
     rps=5;
-    clip=4;
-    reload_delay=2;
+    clip=2;
+    reload_delay=0.5;
     
     rad=0.25;
     float Model[]={-1.  , -1.  ,  1.  , -1.  ,  1.  , -0.5 , -1.  , -0.5 , -0.75,
@@ -37,9 +37,9 @@ void uber::init(){
     health=1000;
     speed=0.05;
     dmg=100;
-    rps=5;
-    clip=4;
-    reload_delay=2;
+    rps=10;
+    clip=400;
+    reload_delay=.2;
     
     rad=0.5;
     float Model[]={0.0, -1.0, 0.0, -0.8, 0.8, -0.8, 0.8,

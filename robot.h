@@ -46,8 +46,6 @@ class robot{
 robot::robot(float X, float Y, float T, int Lim){
     
         team=0;
-        ftime=0;
-        rtime=0;
         x=X+0.5;
         y=Y+0.5;
         t=T;
@@ -77,6 +75,8 @@ void robot::init(){
 void robot::setup(float Model[]){
     hp_max=health;
     mag=clip;
+    ftime=unif()/rps;
+    rtime=unif()*reload_delay;
     model=new float[model_len];
     for(int i=0;i<model_len;i++)
         model[i]=Model[i];
@@ -125,8 +125,11 @@ void robot::move(float dt){
 void robot::ai(lil<robot> & enemies){
     float ang2,X,Y,diff;
     int idx;
-    
-    if (lock_on==NULL || lock_on->dead==1){
+    if(lock_on != NULL && lock_on->health<=0)
+        lock_on=NULL;
+
+
+    if (lock_on==NULL && enemies.len>0){
         idx = randint(enemies.len);
 
         enemies.reset();
@@ -139,18 +142,13 @@ void robot::ai(lil<robot> & enemies){
     
 }
 
-
-
-
-
-
 bool robot::can_shoot(float dt){
     if(rtime>reload_delay)
         if (mag==0)
             mag=clip;
     ftime+=dt;
     rtime+=dt;
-    if(ftime>1/rps && mag>0)
+    if(ftime>1/rps && mag>0 && lock_on != NULL)
         return 1;
     return 0;
 

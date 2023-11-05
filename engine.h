@@ -181,7 +181,7 @@ void engine::collide(){
                             bul=bmap[idx].get();
                             bmap[idx].inc();
                             if(!bul->hit && rob->health>0)
-                                if(abs(bul->x - rob->x)<rob->rad && abs(bul->x - rob->x)<rob->rad){
+                                if(abs(bul->x - rob->x)<rob->rad && abs(bul->y - rob->y)<rob->rad){
                                     rob->health-=bul->dmg;
                                     bul->hit=1;
                                 }

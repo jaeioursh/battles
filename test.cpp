@@ -88,10 +88,16 @@ void test_sfml(){
 }
 
 void test_rend(){
-    render rend(10);
-    engine eng(10);
-    eng.add_bot(1,1,0,1,1);
-    eng.add_bot(5,5,0,0,0);
+    int sz=30;
+    render rend(sz);
+    engine eng(sz);
+    for(int x=0;x<sz;x++){
+        for(int y=0;y<6;y++){
+            eng.add_bot((float) x, (float) y,1.55,0,1);
+            eng.add_bot((float) x, (float) (sz-y-1),-1.55,0,0);
+        }
+    }
+    
     cout<<eng.team1.len<<endl;
     cout<<eng.team2.len<<endl;
     while(1){
