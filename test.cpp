@@ -96,9 +96,9 @@ void test_rend(){
     cout<<eng.team2.len<<endl;
     while(1){
         eng.step(1/rend.fps);
-        if(eng.idx%50==0)
-            cout<<eng.idx<<" "<<eng.bullets2.len<<" "<<eng.bullets1.len<<endl;
-        //rend.draw(eng);
+        //if(eng.idx%50==0)
+        //    cout<<eng.idx<<" "<<eng.team2.len<<" "<<eng.team1.len<<endl;
+        rend.draw(eng);
     }
 
 }

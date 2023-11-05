@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
-
+#include<iostream>
 #include "robot.h"
 #include "bullet.h"
 #include "engine.h"
@@ -37,7 +37,7 @@ class render{
 };
 
 void line_draw(RenderWindow*window, const Vector2f& point1, const Vector2f& point2, float thickness, Color col){
-    thickness*=0.2;
+    thickness*=0.05;
     VertexArray vertices(Quads,4);
     Vector2f direction = point2 - point1;
     Vector2f unitDirection = direction/std::sqrt(direction.x*direction.x+direction.y*direction.y);
@@ -59,12 +59,12 @@ void line_draw(RenderWindow*window, const Vector2f& point1, const Vector2f& poin
 
 render::render(float sz){
         map=sz;
-        WIDTH=600;
-        HEIGHT=600;
-        dx=sz/2;
-        dy=sz/2;
-        scale=10;
-        fps=30;
+        WIDTH=1000;
+        HEIGHT=1000;
+        dx=0;
+        dy=0;
+        scale=WIDTH/sz;
+        fps=60;
 
         
 		window= new RenderWindow(VideoMode(WIDTH, HEIGHT), "My window",Style::Default, ContextSettings(0, 0, 8));
@@ -98,7 +98,7 @@ void render::show(){
 void render::draw_robot(robot& rob,Color col){
 
     float x1,x2,y1,y2,xt,yt;
-    
+    //cout<<rob.model_len<<endl;
     for(int i=0;i<rob.model_len/8;i++){
         for(int j=0;j<4;j++){
             
@@ -148,6 +148,14 @@ void render::draw(engine& eng){
     Color col;
     Color ded;
     
+    Event event;
+    while (window->pollEvent(event))
+    {
+        if (event.type == sf::Event::Closed)
+            window->close();
+    }
+    
+    
     draw_bg();
     for(int q=0;q<2;q++){
         if(q==0){
@@ -162,8 +170,10 @@ void render::draw(engine& eng){
         }   
         team->reset();
         for(int i=0;i<team->len;i++){
+            
             rob=team->get();
             team->inc();
+            //cout<<team->len<<" "<<rob->model_len<<endl;
             draw_robot(*rob,col);
         }
         dead->reset();

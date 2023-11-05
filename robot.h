@@ -11,12 +11,14 @@ using namespace sf;
 class robot{
     public:
 
-    int team,rps;
+    int team;
     float health,hp_max,speed,dmg;
     float x,y,t;
     float lim;
     float rad;
-    int clip,reload_delay,mag;  //stats
+    int clip,mag;
+    float rps,reload_delay;
+    float ftime ,rtime ; //stats
     int offset;
     bool dead;
     robot* lock_on;         //target
@@ -31,7 +33,7 @@ class robot{
     void alt(){
         return;
     }
-    bool can_shoot();
+    bool can_shoot(float);
     bullet* shoot();
     void ai(lil<robot> & );
     void move(float);
@@ -44,6 +46,8 @@ class robot{
 robot::robot(float X, float Y, float T, int Lim){
     
         team=0;
+        ftime=0;
+        rtime=0;
         x=X+0.5;
         y=Y+0.5;
         t=T;
@@ -100,9 +104,9 @@ void robot::move(float dt){
             diff=-0.1;
 
 
-        t+=diff*speed*dt;
-        x+=cos(t)*speed*dt;
-        y+=sin(t)*speed*dt;
+        t+=diff*speed*dt*50;
+        x+=cos(t)*speed*dt*5;
+        y+=sin(t)*speed*dt*5;
         if (t>M_PI)
             t-=M_PI*2;
         if (t<-M_PI)
@@ -140,20 +144,24 @@ void robot::ai(lil<robot> & enemies){
 
 
 
-bool robot::can_shoot(){
-    clip--;
-    if (clip<0){
-        if (-clip==reload_delay)
-            clip=mag;
-        return 0;
-    }
-    else
-        return 1; 
+bool robot::can_shoot(float dt){
+    if(rtime>reload_delay)
+        if (mag==0)
+            mag=clip;
+    ftime+=dt;
+    rtime+=dt;
+    if(ftime>1/rps && mag>0)
+        return 1;
+    return 0;
 
 
 }
 
 bullet* robot::shoot(){
+    mag--;
+    ftime=0;
+    if (mag==0)
+        rtime=0;
     bullet* blt=new bullet();                            //size,speed
     blt->set(x,y,t,dmg,10.0,10.0);
     return blt;

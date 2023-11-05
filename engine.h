@@ -131,7 +131,7 @@ void engine::move(float dt){
             team->inc();
             rob->ai(*enemy);
             rob->move(dt);
-            if(rob->can_shoot()){
+            if(rob->can_shoot(dt)){
                 bul=rob->shoot();
                 bullets->add(bul);
             }
@@ -181,7 +181,7 @@ void engine::collide(){
                             bul=bmap[idx].get();
                             bmap[idx].inc();
                             if(!bul->hit && rob->health>0)
-                                if(abs(bul->x-rob->x)<1.0 && abs(bul->x - rob->x)<1.0){
+                                if(abs(bul->x - rob->x)<rob->rad && abs(bul->x - rob->x)<rob->rad){
                                     rob->health-=bul->dmg;
                                     bul->hit=1;
                                 }
@@ -220,6 +220,7 @@ void engine::add_bot(float x,float y,float t,int typ,int tteam){
         rob=new uber(x,y,t,map_size);
     
     if(rob!=NULL)
+        rob->init();
         team->add(rob);
 
 }
