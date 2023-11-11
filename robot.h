@@ -23,25 +23,26 @@ class robot{
     bool dead;
     robot* lock_on;         //target
     float *model;           //values for model shape
+    float *angles;
     int model_len;
 
     
     explicit robot(float,float, float, int);
     virtual void init();
-    void setup(float[]);
+    void setup(float[],float[]);
     ~robot();
-    void alt(){
-        return;
-    }
     bool can_shoot(float);
     bullet* shoot();
     void ai(lil<robot> & );
     void move(float);
+    virtual robot* alt(float);
 
 };
 
 
-
+robot* robot::alt(float dt){
+    return NULL;
+}
 
 robot::robot(float X, float Y, float T, int Lim){
     
@@ -69,17 +70,21 @@ void robot::init(){
     reload_delay=2;
     
     float Model[]={-1.  , -1.  , -1.  ,  1. };
-    setup(Model);
+    //setup(Model);
 }
 
-void robot::setup(float Model[]){
+void robot::setup(float Model[],float fire_angs[]){
     hp_max=health;
     mag=clip;
     ftime=unif()/rps;
     rtime=unif()*reload_delay;
     model=new float[model_len];
+    angles=new float[clip];
     for(int i=0;i<model_len;i++)
         model[i]=Model[i];
+    for(int i=0;i<clip;i++)
+        angles[i]=fire_angs[i];
+    
 }
 
 void robot::move(float dt){
@@ -111,12 +116,12 @@ void robot::move(float dt){
             t-=M_PI*2;
         if (t<-M_PI)
             t+=M_PI*2;
-        if (y>lim-1)
-            y=lim-1;
+        if (y>lim)
+            y=lim;
         if (y<0)
             y=0;
-        if (x>lim-1)
-            x=lim-1;
+        if (x>lim)
+            x=lim;
         if (x<0)
             x=0;
     }
@@ -161,7 +166,7 @@ bullet* robot::shoot(){
     if (mag==0)
         rtime=0;
     bullet* blt=new bullet();                            //size,speed
-    blt->set(x,y,t,dmg,10.0,10.0);
+    blt->set(x+cos(t+angles[mag])*rad,y+sin(t+angles[mag])*rad,t,dmg,10.0,10.0);
     return blt;
 }
 

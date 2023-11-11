@@ -88,13 +88,13 @@ void test_sfml(){
 }
 
 void test_rend(){
-    int sz=30;
+    int sz=10;
     render rend(sz);
     engine eng(sz);
-    for(int x=0;x<sz;x++){
-        for(int y=0;y<6;y++){
-            eng.add_bot((float) x, (float) y,1.55,0,1);
-            eng.add_bot((float) x, (float) (sz-y-1),-1.55,0,0);
+    for(int x=0;x<1;x++){
+        for(int y=0;y<1;y++){
+            eng.add_bot((float) x+5, (float) y+5,1.55,3,1);
+            //eng.add_bot((float) x, (float) (sz-y-1),-1.55,3,0);
         }
     }
     
@@ -104,7 +104,8 @@ void test_rend(){
         eng.step(1/rend.fps);
         //if(eng.idx%50==0)
         //    cout<<eng.idx<<" "<<eng.team2.len<<" "<<eng.team1.len<<endl;
-        rend.draw(eng);
+        if(rend.draw(eng))
+            return;
     }
 
 }

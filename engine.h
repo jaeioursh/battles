@@ -50,8 +50,10 @@ void engine::reset(){
 
 void engine::step(float dt){
     move(dt);
-    clean();
-    collide();
+    if (idx%3==0){
+        clean();
+        collide();
+    }
     idx++;
 
 
@@ -110,6 +112,7 @@ void engine::clean(){
 }
 void engine::move(float dt){
     robot* rob;
+    robot* spawn;
     bullet* bul;
     int x,y,idx;
 
@@ -131,6 +134,9 @@ void engine::move(float dt){
             team->inc();
             rob->ai(*enemy);
             rob->move(dt);
+            spawn=rob->alt(dt);
+            if(spawn != NULL)
+                team->add(spawn);
             if(rob->can_shoot(dt)){
                 bul=rob->shoot();
                 bullets->add(bul);
@@ -215,8 +221,14 @@ void engine::add_bot(float x,float y,float t,int typ,int tteam){
         team = &team2;
     }
     if(typ==0)
-        rob=new large(x,y,t,map_size);
+        rob=new medium(x,y,t,map_size);
     if(typ==1)
+        rob=new large(x,y,t,map_size);
+    if(typ==2)
+        rob=new turret(x,y,t,map_size);
+    if(typ==3)
+        rob=new replicator(x,y,t,map_size);
+    if(typ==4)
         rob=new uber(x,y,t,map_size);
     
     if(rob!=NULL)

@@ -594,10 +594,11 @@ if 0:
         #use 24-30 // lower= higher quality, lower compression
 
 
-model=uber
+model=replicator
 mdl=model((0,0),0,0).model
 mdl=mdl/np.max(mdl)
 mdl=mdl[:,::-1]
 mdl=mdl.flatten()
+mdl=np.round(mdl,4)
 print(list(mdl))
 print(len(mdl))
