@@ -5,7 +5,8 @@
 #include "bullet.h"
 #include "bots.h"
 #include "render.h"
-
+#include <cstdlib>
+#include <time.h>
 #include<iostream>
 
 using namespace std;
@@ -88,13 +89,15 @@ void test_sfml(){
 }
 
 void test_rend(){
-    int sz=10;
+    srand(time(NULL));
+    int sz=50;
+    int rows=1;
     render rend(sz);
     engine eng(sz);
-    for(int x=0;x<1;x++){
-        for(int y=0;y<1;y++){
-            eng.add_bot((float) x+5, (float) y+5,1.55,3,1);
-            //eng.add_bot((float) x, (float) (sz-y-1),-1.55,3,0);
+    for(int x=0;x<sz;x++){
+        for(int y=0;y<rows;y++){
+            eng.add_bot((float) x, (float) y,1.55,3,1);
+            eng.add_bot((float) x, (float) (sz-y-1),-1.55,3,0);
         }
     }
     

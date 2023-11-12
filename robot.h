@@ -6,12 +6,14 @@
 #include "bullet.h"
 #include "utils.h"
 #include "lil.h"
+#include<iostream>
 using namespace sf;
 
 class robot{
     public:
 
     int team;
+    int index;
     float health,hp_max,speed,dmg;
     float x,y,t;
     float lim;
@@ -109,7 +111,7 @@ void robot::move(float dt){
             diff=-0.1;
 
 
-        t+=diff*speed*dt*50;
+        t+=diff*speed*dt*250;
         x+=cos(t)*speed*dt*5;
         y+=sin(t)*speed*dt*5;
         if (t>M_PI)
@@ -165,8 +167,8 @@ bullet* robot::shoot(){
     ftime=0;
     if (mag==0)
         rtime=0;
-    bullet* blt=new bullet();                            //size,speed
-    blt->set(x+cos(t+angles[mag])*rad,y+sin(t+angles[mag])*rad,t,dmg,10.0,10.0);
+    bullet* blt=new bullet();                                        //size,speed
+    blt->set(x+cos(t+angles[mag])*rad,y+sin(t+angles[mag])*rad,t,dmg,10.0,7.0);
     return blt;
 }
 

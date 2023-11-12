@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include<iostream>
+#include <chrono>
 #include "robot.h"
 #include "bullet.h"
 #include "engine.h"
@@ -11,6 +12,7 @@
 #include "bots.h"
 
 using namespace sf;
+using namespace std;
 
 class render{
 
@@ -21,6 +23,11 @@ class render{
     float map;
     int WIDTH,HEIGHT;
     float fps;
+    int index;
+
+    double thy;
+    chrono::high_resolution_clock::time_point thyme;
+    
 
     Sprite* background;
     RenderWindow* window;
@@ -28,46 +35,42 @@ class render{
     Texture texture;
     Vector2f center;
     
+    Sprite sprites[16];
+    Texture tex;
+    Image tiles;
+
+    Text text;
+	Font font;
+    
 
     void draw_robot(robot&,Color);
     void draw_bullet(bullet&,Color);
     void draw_bg();
     bool draw(engine&);
     void show();
-    void line_draw(RenderWindow*,const Vector2f&,const Vector2f& ,Color);
+    void load_sprite();
+    void size_sprite();
     render(float);
     ~render();
 };
 
-void render::line_draw(RenderWindow*window, const Vector2f& point1, const Vector2f& point2, Color col){
-    float thickness=0.02;
-    VertexArray vertices(Quads,4);
+void render::load_sprite(){
+    tiles.loadFromFile("robots.png");
+    tex.loadFromImage(tiles);
+    int x,y;
+    for(int i=0;i<16;i++){
+        sprites[i].setTexture(tex);
+        x=i%4;
+        y=i/4;
+        sprites[i].setTextureRect(IntRect(x*16,y*16,16,16));
+        sprites[i].setPosition(0, 0);
+        //sprites[i].setOrigin(Vector2f(4,4));
+        sprites[i].setOrigin(sf::Vector2f(sprites[i].getLocalBounds().width, sprites[i].getLocalBounds().height) / 2.f);
 
-    
-    Vector2f delta = Vector2f(dx,dy);
-
-    Vector2f direction = point2 - point1;
-    Vector2f unitDirection = direction/std::sqrt(direction.x*direction.x+direction.y*direction.y);
-    Vector2f unitPerpendicular(-unitDirection.y,unitDirection.x);
-
-    Vector2f offset = (thickness/2.f)*unitPerpendicular;
-
-    vertices[0].position = point1 + offset;
-    vertices[1].position = point2 + offset;
-    vertices[2].position = point2 - offset;
-    vertices[3].position = point1 - offset;
-    for (int i = 0; i < 4; ++i){
-        vertices[i].position-=delta;
-        vertices[i].position*=scale;
-        //vertices[i].position+=scale*delta;
-        vertices[i].position+=center;
-        vertices[i].color = col;
     }
-        
-    
-    window->draw(vertices);
     
 }
+
 
 
 render::render(float sz){
@@ -80,7 +83,19 @@ render::render(float sz){
         scale=WIDTH/sz;
         fps=60;
 
+
+        load_sprite();
+
+        index=0;
+        thy=0.1;
+        thyme=chrono::high_resolution_clock::now();
         
+        font.loadFromFile("tech.TTF");
+        text.setFillColor(Color::Magenta);
+        text.setFont(font); 
+        text.setCharacterSize(80); 
+
+
 		window= new RenderWindow(VideoMode(WIDTH, HEIGHT), "My window" ,Style::Default, ContextSettings(0, 0, 8));
         window->setFramerateLimit(fps);
 
@@ -110,42 +125,34 @@ void render::show(){
 }
 
 void render::draw_robot(robot& rob,Color col){
+    float x,y,r;
+    x=(rob.x-dx)*scale+center.x;
+    y=(rob.y-dy)*scale+center.y;
+    r=rob.rad*scale;
+    if(x<-r || x>WIDTH+r || y<-r || y>HEIGHT+r)
+        return;
+    sprites[rob.index].setPosition(x,y);
+    sprites[rob.index].setColor(col);
+    sprites[rob.index].setScale(rob.rad*scale/8.,rob.rad*scale/8.);
+    window->draw(sprites[rob.index]);
+    
 
-    float x1,x2,y1,y2,xt,yt;
-    //cout<<rob.model_len<<endl;
-    for(int i=0;i<rob.model_len/8;i++){
-        for(int j=0;j<4;j++){
-            
-            x1=rob.model[i*8+j*2]*rob.rad;
-            y1=rob.model[i*8+j*2+1]*rob.rad;
-            if (j==3){
-                x2=rob.model[i*8]*rob.rad;
-                y2=rob.model[i*8+1]*rob.rad;
-            }
-            else{
-                x2=rob.model[i*8+j*2+2]*rob.rad;
-                y2=rob.model[i*8+j*2+3]*rob.rad;
-            }
-            xt=cos(rob.t)*x1-sin(rob.t)*y1 + rob.x;
-            yt=sin(rob.t)*x1+cos(rob.t)*y1 + rob.y;
-            x1=xt;
-            y1=yt;
-
-            xt=cos(rob.t)*x2-sin(rob.t)*y2 + rob.x;
-            yt=sin(rob.t)*x2+cos(rob.t)*y2 + rob.y;
-            x2=xt;
-            y2=yt;
-            
-            line_draw(window, Vector2f(x1,y1), Vector2f(x2,y2),col);
-
-        }
-    }
-
+   
 }
 
 void render::draw_bullet(bullet& bul,Color col){
 
-    line_draw(window, Vector2f(bul.x-cos(bul.t)*.25,bul.y-sin(bul.t)*0.25), Vector2f(bul.x,bul.y),col);
+    float x,y,r;
+    x=(bul.x-dx)*scale+center.x;
+    y=(bul.y-dy)*scale+center.y;
+    r=0.1*scale;
+    if(x<-r || x>WIDTH+r || y<-r || y>HEIGHT+r)
+        return;
+    sprites[15].setPosition(x, y);
+    sprites[15].setColor(col);
+    sprites[15].setScale(scale/50.,scale/50.);
+    sprites[15].setRotation(bul.t*180/M_PI-90);
+    window->draw(sprites[15]);
 
 }
 
@@ -165,6 +172,7 @@ bool render::draw(engine& eng){
     Event event;
     float dd=200/scale;
     float SCALE=0.95;
+    index+=1;
     while (window->pollEvent(event))
     {
         
@@ -188,6 +196,9 @@ bool render::draw(engine& eng){
     if(Keyboard::isKeyPressed(Keyboard::F)){
         scale/=SCALE;
     }
+
+    
+
     
     
     draw_bg();
@@ -201,6 +212,12 @@ bool render::draw(engine& eng){
             team = &(eng.team2); dead=&(eng.dead2); bullets=&(eng.bullets2);
             col=Color(0,0,255);
             ded=Color(0,0,100);
+        }
+        dead->reset();
+        for(int i=0;i<dead->len;i++){
+            rob=dead->get();
+            dead->inc();
+            draw_robot(*rob,ded);
         }   
         team->reset();
         for(int i=0;i<team->len;i++){
@@ -210,12 +227,7 @@ bool render::draw(engine& eng){
             //cout<<team->len<<" "<<rob->model_len<<endl;
             draw_robot(*rob,col);
         }
-        dead->reset();
-        for(int i=0;i<dead->len;i++){
-            rob=dead->get();
-            dead->inc();
-            draw_robot(*rob,ded);
-        }
+        
         bullets->reset();
         for(int i=0;i<bullets->len;i++){
             bul=bullets->get();
@@ -223,6 +235,18 @@ bool render::draw(engine& eng){
             bullets->inc();
         }
     }
+
+    if(index%10==0){
+        chrono::duration<double> diff = 
+        chrono::high_resolution_clock::now()-thyme;
+        
+        thyme=chrono::high_resolution_clock::now();
+        thy=10.0/diff.count();
+    }
+    text.setString("H: "+to_string(thy)+" "+to_string(bullets->len));
+    window->draw(text);
+
+
     show();
     return 0;
 }

@@ -41,7 +41,7 @@ vector<vector<int>> read_csv(string filename) {
 
 
 float unif(){
-    return float(rand()%1000000000)/1000000000;
+    return float(rand()%100000)/100000.0;
 }
 
 int randint(int val){
