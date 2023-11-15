@@ -49,7 +49,7 @@ template <typename T> void lil<T>::add(T* val){
     if (n->next != NULL)
         n->next->prev=n;
     head=n;
-    point=n;
+    //point=n;
     len++;
 }
 

@@ -5,6 +5,7 @@
 #include <SFML/Window.hpp>
 #include<iostream>
 #include <chrono>
+#include<algorithm>
 #include "robot.h"
 #include "bullet.h"
 #include "engine.h"
@@ -183,21 +184,22 @@ bool render::draw(engine& eng){
         
     }
     if(Keyboard::isKeyPressed(Keyboard::W))
-        dy+=dd/fps;
-    if(Keyboard::isKeyPressed(Keyboard::S))
         dy-=dd/fps;
+    if(Keyboard::isKeyPressed(Keyboard::S))
+        dy+=dd/fps;
     if(Keyboard::isKeyPressed(Keyboard::A))
-        dx+=dd/fps;
-    if(Keyboard::isKeyPressed(Keyboard::D))
         dx-=dd/fps;
+    if(Keyboard::isKeyPressed(Keyboard::D))
+        dx+=dd/fps;
     if(Keyboard::isKeyPressed(Keyboard::R)){
-        scale*=SCALE;
-    }
-    if(Keyboard::isKeyPressed(Keyboard::F)){
         scale/=SCALE;
     }
-
-    
+    if(Keyboard::isKeyPressed(Keyboard::F)){
+        scale*=SCALE;
+    }
+    dx=min(max(dx,0.f),map);
+    dy=min(max(dy,0.f),map);
+    scale=min(max(scale,10.f),1000.f);
 
     
     
@@ -243,7 +245,7 @@ bool render::draw(engine& eng){
         thyme=chrono::high_resolution_clock::now();
         thy=10.0/diff.count();
     }
-    text.setString("H: "+to_string(thy)+" "+to_string(bullets->len));
+    text.setString("T1: "+to_string(eng.team1.len)+" T2:"+to_string(eng.team2.len));
     window->draw(text);
 
 

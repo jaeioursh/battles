@@ -136,8 +136,10 @@ void engine::move(float dt){
             rob->ai(*enemy);
             rob->move(dt);
             spawn=rob->alt(dt);
-            if(spawn != NULL)
+            if(spawn != NULL){
                 team->add(spawn);
+                i++;
+            }
             if(rob->can_shoot(dt)){
                 bul=rob->shoot();
                 bullets->add(bul);
